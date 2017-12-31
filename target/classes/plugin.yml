@@ -1,0 +1,4 @@
+name: Skywars
+main: net.arcanemc.skywars2.Skywars
+version: 0.0.1
+depend: [CoreRunner]

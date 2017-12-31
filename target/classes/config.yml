@@ -1,0 +1,72 @@
+spawns: 12
+lobby:
+    world: "world"
+    x: 304.5
+    y: 83
+    z: -896.5
+map:
+    spawn:
+        world: "world"
+        x: -415.5
+        y: 95
+        z: -897.5
+    spawn0:
+        world: "world"
+        x: 357.5
+        y: 51
+        z: -873.5
+    spawn1:
+        world: "world"
+        x: -366.5
+        y: 51
+        z: -849.5
+    spawn2:
+        world: "world"
+        x: -390.5
+        y: 51
+        z: -850.5
+    spawn3:
+        world: "world"
+        x: -440.5
+        y: 51
+        z: -840.5
+    spawn4:
+        world: "world"
+        x: -464.5
+        y: 51
+        z: -849.5
+    spawn5:
+        world: "world"
+        x: -473.5
+        y: 51
+        z: -873.5
+    spawn6:
+        world: "world"
+        x: -473.5
+        y: 51
+        z: -923.5
+    spawn7:
+        world: "world"
+        x: -464.5
+        y: 51
+        z: -947.5
+    spawn8:
+        world: "world"
+        x: -440.5
+        y: 51
+        z: -956.5
+    spawn9:
+        world: "world"
+        x: -390.5
+        y: 51
+        z: -956.5
+    spawn10:
+        world: "world"
+        x: -366.5
+        y: 51
+        z: -947.5
+    spawn11:
+        world: "world"
+        x: -357.5
+        y: 51
+        z: -923.5
