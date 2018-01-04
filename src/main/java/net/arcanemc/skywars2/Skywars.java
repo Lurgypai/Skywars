@@ -1,5 +1,8 @@
 package net.arcanemc.skywars2;
 
+import java.util.ArrayList;
+import java.util.Random;
+
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -14,8 +17,9 @@ public class Skywars extends JavaPlugin {
 	private ConnectionManager connManager = new ConnectionManager();
 	UserRetreiver uRet;
 	private Game game;
+	private LootPool lootpool;
 	private int NUM_SPAWNS = this.getConfig().getInt("spawns");
-	
+	public static Random rand = new Random();
 	static Skywars instance;
 	static Skywars getInstance() {
 		return instance;
@@ -23,10 +27,15 @@ public class Skywars extends JavaPlugin {
 	
 	public Skywars() {
 		instance = this;
+		lootpool = LootPool.obtain().get();
 	}
 	
 	public Game getGame() {
 		return this.game;
+	}
+	
+	public LootPool getLootPool() {
+		return this.lootpool;
 	}
 	
 	public int getNumSpawns() {
@@ -35,6 +44,8 @@ public class Skywars extends JavaPlugin {
 	@Override
 	public void onEnable() {
 		//load and register maps from the config
+		
+		Bukkit.getServer().getPluginManager().registerEvents(new GameListener(this), this);
 		
 		connManager.initializeDatabasePool("skywars_main", RDBMS.POSTGRESQL, "app", "?_9KpC4q7&#Y/Rwu", "127.0.0.1", 5432, "prod", 2);
 		uRet = new UserRetreiver(connManager, "skywars_main");
@@ -54,6 +65,18 @@ public class Skywars extends JavaPlugin {
 		double y = this.getConfig().getDouble(locationName + ".y");
 		double z = this.getConfig().getDouble(locationName + ".z");
 		return new Location(world, x, y, z);
+	}
+	
+	public static ArrayList<Integer> generateRandomOrder(int numberOf, int min, int max) {
+		ArrayList<Integer> generated = new ArrayList<Integer>();
+		while(generated.size() != numberOf) {
+			int i = Skywars.rand.nextInt(Skywars.rand.nextInt(max - min) + min);
+			while(generated.contains(i)) {
+				i = Skywars.rand.nextInt(Skywars.rand.nextInt(max - min) + min);
+			}
+			generated.add(i);
+		}
+		return generated;
 	}
 }
 

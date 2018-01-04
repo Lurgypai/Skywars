@@ -5,19 +5,27 @@ import java.util.Random;
 
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.block.Chest;
+import org.bukkit.craftbukkit.v1_8_R3.block.CraftBlock;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.inventory.Inventory;
 
+import net.arcanemc.corev2.game.GameChatFormat;
 import net.arcanemc.corev2.game.GameUser;
 import net.arcanemc.corev2.game.GameUser.Mode;
+import net.arcanemc.corev2.game.State;
 import net.arcanemc.corev2.game.events.GameEndEvent;
 import net.arcanemc.corev2.game.events.GameStartEvent;
 import net.arcanemc.corev2.user.User;
 
-public class GameListener {
+public class GameListener implements Listener{
 	
 	Skywars plugin;
 	
@@ -51,9 +59,11 @@ public class GameListener {
         Bukkit.getOnlinePlayers().forEach(pl -> pl.hidePlayer(e.getEntity()));
         //teleport
         e.getEntity().teleport(plugin.deserializeLocation("map.spawn"));
+        Bukkit.broadcastMessage(GameChatFormat.ANNOUNCEMENT.getFormat() + "Player: " + e.getEntity().getDisplayName() + " has died.");
         //check if we have a winner
         if(plugin.getGame().getGpAdmin().getPlayers().stream().filter(u -> u.getMode() == Mode.PLAYER).toArray().length == 1) {
         	Bukkit.broadcastMessage("Winner winner chicken dinner");
+        	plugin.getGame().setState(State.END_WAIT);
         }
         //appropriate message
 	}
@@ -62,6 +72,7 @@ public class GameListener {
 	public void onQuit(PlayerQuitEvent e) {
 		if(plugin.getGame().getGpAdmin().getPlayers().stream().filter(u -> u.getMode() == Mode.PLAYER).toArray().length == 1) {
 	    	Bukkit.broadcastMessage("Winner winner chicken dinner");
+        	plugin.getGame().setState(State.END_WAIT);
 	    }
 	}
 	
@@ -69,13 +80,12 @@ public class GameListener {
 	@EventHandler
 	public void onStart(GameStartEvent e) {
 		//teleport players to spawns or hub place
-		Random rand = new Random();
 		ArrayList<Integer> generated = new ArrayList<Integer>();
 		while(generated.size() != 
 				plugin.getGame().getGpAdmin().getPlayers().stream().filter(u -> u.getMode() == Mode.PLAYER).toArray().length) {
-			int i = rand.nextInt(rand.nextInt(plugin.getNumSpawns() - 1) + 1);
+			int i = Skywars.rand.nextInt(Skywars.rand.nextInt(plugin.getNumSpawns() - 1) + 1);
 			while(generated.contains(i)) {
-				i = rand.nextInt(rand.nextInt(plugin.getNumSpawns() - 1) + 1);
+				i = Skywars.rand.nextInt(Skywars.rand.nextInt(plugin.getNumSpawns() - 1) + 1);
 			}
 			generated.add(i);
 		}
@@ -89,10 +99,22 @@ public class GameListener {
 				player.teleport(plugin.deserializeLocation("lobby"));
 			}
 		}
+		//fill chests
 	}
 	
 	@EventHandler
 	public void onEnd(GameEndEvent e) {
-		//restart server
+	}
+	
+	private void fillChests() {
+		//obtain chest locations
+		//temporary
+		Location loc = plugin.deserializeLocation("lobby");
+		if(loc.getBlock().getType() == Material.CHEST) {
+			Chest chest = (Chest) loc.getBlock();
+			//get a tag that says its ring location (set when the chest is obtained for building)
+			
+		}
+		//use loot level to generate chests with identified loot level gear
 	}
 }

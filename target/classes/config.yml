@@ -1,7 +1,7 @@
 spawns: 12
 lobby:
     world: "world"
-    x: 304.5
+    x: -304.5
     y: 83
     z: -896.5
 map:
@@ -12,19 +12,19 @@ map:
         z: -897.5
     spawn0:
         world: "world"
-        x: 357.5
+        x: -357.5
         y: 51
         z: -873.5
     spawn1:
         world: "world"
         x: -366.5
         y: 51
-        z: -849.5
+        z: -849.5 
     spawn2:
         world: "world"
         x: -390.5
         y: 51
-        z: -850.5
+        z: -840.5
     spawn3:
         world: "world"
         x: -440.5
