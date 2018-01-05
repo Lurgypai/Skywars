@@ -1,21 +1,22 @@
 package net.arcanemc.skywars2;
 
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Random;
 
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
-import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.block.Chest;
-import org.bukkit.craftbukkit.v1_8_R3.block.CraftBlock;
+import org.bukkit.craftbukkit.v1_8_R3.inventory.CraftItemStack;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.inventory.Inventory;
+import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scheduler.BukkitTask;
 
 import net.arcanemc.corev2.game.GameChatFormat;
 import net.arcanemc.corev2.game.GameUser;
@@ -24,6 +25,7 @@ import net.arcanemc.corev2.game.State;
 import net.arcanemc.corev2.game.events.GameEndEvent;
 import net.arcanemc.corev2.game.events.GameStartEvent;
 import net.arcanemc.corev2.user.User;
+import net.minecraft.server.v1_8_R3.NBTTagCompound;
 
 public class GameListener implements Listener{
 	
@@ -104,17 +106,31 @@ public class GameListener implements Listener{
 	
 	@EventHandler
 	public void onEnd(GameEndEvent e) {
+		//restart
 	}
 	
-	private void fillChests() {
-		//obtain chest locations
-		//temporary
-		Location loc = plugin.deserializeLocation("lobby");
-		if(loc.getBlock().getType() == Material.CHEST) {
-			Chest chest = (Chest) loc.getBlock();
-			//get a tag that says its ring location (set when the chest is obtained for building)
-			
+	@EventHandler
+	public void onPlace(BlockPlaceEvent e) {
+			if (e.getPlayer().getItemInHand().getType() == Material.CHEST) {
+				net.minecraft.server.v1_8_R3.ItemStack nmsItem = CraftItemStack.asNMSCopy(e.getPlayer().getItemInHand());
+				NBTTagCompound tag = nmsItem.getTag();
+				if(tag.hasKey("swtype")) {
+					new Thread(() -> {
+						String insert = "INSERT INTO chests (type, worldname, x, y, z), VALUES (?, ?, ?, ?, ?)";
+						try {
+							PreparedStatement stmnt = plugin.getConn().prepareStatement(insert);
+							stmnt.setInt(1, tag.getInt("swtype"));
+							stmnt.setString(2, e.getBlockPlaced().getWorld().getName());
+							stmnt.setInt(3, e.getBlockPlaced().getX());
+							stmnt.setInt(4, e.getBlockPlaced().getY());
+							stmnt.setInt(5, e.getBlockPlaced().getZ());
+							stmnt.executeUpdate();
+						} catch (SQLException e1) {
+							// TODO Auto-generated catch block
+							e1.printStackTrace();
+						}
+					}).start();
+			}
 		}
-		//use loot level to generate chests with identified loot level gear
 	}
 }
