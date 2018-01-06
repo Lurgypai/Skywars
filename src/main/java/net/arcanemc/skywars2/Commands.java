@@ -6,18 +6,21 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
+import net.arcanemc.corev2.commands.Argument;
 import net.arcanemc.corev2.commands.Command;
+import net.arcanemc.corev2.commands.CommandLoader;
 import net.minecraft.server.v1_8_R3.NBTTagCompound;
 
 public class Commands {
 	
-	@Command(names = "swchest", permission = "skywars.chest", noPerms = "Admin only.", usage = "/swchest <type>")
-	public void swchest(@Inject(data = Inject.Data.Sender, nullable = false) Player sender) {
-		String type = "";
+	Commands() {
+		CommandLoader loader = new CommandLoader();
+		loader.loadCommands(this);
+	}
+	
+	@Command(names = {}, permission = "skywars.chest", noPerms = "Admin only.", usage = "/swchest <type>")
+	public void swchest(@Argument(dataType = Argument.Data.SENDER, nullable = false) Player sender, @Argument(nullable = false) String type) {
 		ItemStack item = new ItemStack(Material.CHEST, 1, (byte)0);
-		ItemMeta meta = item.getItemMeta();
-		meta.setDisplayName("SW Chest: " + type);
-		item.setItemMeta(meta);
 		NBTTagCompound nbttc = new NBTTagCompound();
 		
 		if(type.equalsIgnoreCase("spawn")) {
@@ -34,6 +37,11 @@ public class Commands {
 		nmsItem.setTag(nbttc);
 		
 		item = CraftItemStack.asBukkitCopy(nmsItem);
+		
+		ItemMeta meta = item.getItemMeta();
+		meta.setDisplayName("SW Chest: " + type);
+		item.setItemMeta(meta);
+		
 		sender.getInventory().addItem(item);
 	}
 }

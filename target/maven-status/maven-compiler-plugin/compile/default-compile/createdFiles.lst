@@ -1,4 +1,12 @@
+net\arcanemc\skywars2\LootPool.class
 net\arcanemc\skywars2\GameListener$1.class
+net\arcanemc\skywars2\Commands.class
+net\arcanemc\skywars2\kit\PoisonKitExecutor.class
+net\arcanemc\skywars2\kit\KitManager.class
 net\arcanemc\skywars2\AppTest.class
 net\arcanemc\skywars2\GameListener.class
 net\arcanemc\skywars2\Skywars.class
+net\arcanemc\skywars2\kit\Kit.class
+net\arcanemc\skywars2\kit\KitExecutor.class
+net\arcanemc\skywars2\LootPool$1.class
+net\arcanemc\skywars2\LootPool$Level.class

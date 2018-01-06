@@ -19,14 +19,17 @@ import net.arcanemc.corev2.database.ConnectionManager;
 import net.arcanemc.corev2.database.ConnectionManager.RDBMS;
 import net.arcanemc.corev2.game.Game;
 import net.arcanemc.corev2.user.UserRetreiver;
+import net.arcanemc.skywars2.kit.KitManager;
 
 public class Skywars extends JavaPlugin {
 	private ConnectionManager connManager = new ConnectionManager();
 	private UserRetreiver uRet;
 	private Connection conn;
+	private Commands commands = new Commands();
 	
 	private Game game;
 	private LootPool lootpool;
+	private KitManager kitmanager;
 	
 	private int NUM_SPAWNS = this.getConfig().getInt("spawns");
 	public static Random rand = new Random();
@@ -49,6 +52,10 @@ public class Skywars extends JavaPlugin {
 		return this.conn;
 	}
 	
+	public KitManager getKitManager() {
+		return this.kitmanager;
+	}
+	
 	public LootPool getLootPool() {
 		return this.lootpool;
 	}
@@ -61,6 +68,7 @@ public class Skywars extends JavaPlugin {
 		//load and register maps from the config
 		
 		Bukkit.getServer().getPluginManager().registerEvents(new GameListener(this), this);
+		Bukkit.getServer().getPluginManager().registerEvents(new KitManager(), this);
 		
 		connManager.initializeDatabasePool("skywars_main", RDBMS.POSTGRESQL, "app", "?_9KpC4q7&#Y/Rwu", "127.0.0.1", 5432, "prod", 2);
 		conn = connManager.getPooledConnection("skywars_main");
@@ -70,12 +78,14 @@ public class Skywars extends JavaPlugin {
 			//or not do anything with it, or do something else completely?
 			return true;
 		}));
+		//fill chests async
 		runChests();
 	}
 
 	@Override
 	public void onDisable() {	}
 	
+	//obtain location from config.yml
 	public Location deserializeLocation(String locationName) {
 		World world = Bukkit.getWorld(this.getConfig().getString(locationName + ".world"));
 		double x = this.getConfig().getDouble(locationName + ".x");
@@ -84,12 +94,13 @@ public class Skywars extends JavaPlugin {
 		return new Location(world, x, y, z);
 	}
 	
+	//generate numberOf numbers in range [min, max)
 	public static ArrayList<Integer> generateRandomOrder(int numberOf, int min, int max) {
 		ArrayList<Integer> generated = new ArrayList<Integer>();
 		while(generated.size() != numberOf) {
-			int i = Skywars.rand.nextInt(Skywars.rand.nextInt(max - min) + min);
+			int i = (Skywars.rand.nextInt(max - min) + min);
 			while(generated.contains(i)) {
-				i = Skywars.rand.nextInt(Skywars.rand.nextInt(max - min) + min);
+				i = (Skywars.rand.nextInt(max - min) + min);
 			}
 			generated.add(i);
 		}
@@ -101,10 +112,10 @@ public class Skywars extends JavaPlugin {
 	 * Table Name "Chests"
 	 * int type(0-3), char worldname, int x, int y, int z
 	 */
-	
+	//load chests
 	public void locateAndFillChests() {
-		String retrieveChest = "SELECT * FROM chests";
-		
+		Bukkit.getLogger().info("[Skywars] Began loading chests.");
+		String retrieveChest = "SELECT * FROM chests;";
 		try {
 			PreparedStatement stmnt = conn.prepareStatement(retrieveChest);
 			ResultSet rs = stmnt.executeQuery();
@@ -117,15 +128,16 @@ public class Skywars extends JavaPlugin {
 				
 				Location loc = new Location(Bukkit.getWorld(worldName), x, y, z);
 				if(loc.getBlock().getType() == Material.CHEST) {
-					Chest chest = (Chest)loc.getBlock();
+					Chest chest = (Chest)loc.getBlock().getState();
 					lootpool.generateLoot(chest, LootPool.Level.values()[type]);
 				}
 			}
+			Bukkit.getLogger().info("[Skywars] Chests loaded.");
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
 	}
-	
+	//locate and fill chest async (wait 10 secs and give up)
 	public void runChests() {
 		CompletableFuture<Void> chests = CompletableFuture.runAsync(() -> locateAndFillChests());
 		Bukkit.getScheduler().scheduleSyncDelayedTask(this, () -> {

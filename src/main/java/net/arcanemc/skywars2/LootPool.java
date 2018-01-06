@@ -3,6 +3,7 @@ package net.arcanemc.skywars2;
 import java.util.ArrayList;
 import java.util.Optional;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.block.Chest;
 import org.bukkit.inventory.Inventory;
@@ -12,10 +13,10 @@ import org.bukkit.inventory.meta.ItemMeta;
 public class LootPool {
 	
 	private static boolean exists;
-	private ArrayList<ItemStack> spawn;
-	private ArrayList<ItemStack> outer;
-	private ArrayList<ItemStack> inner;
-	private ArrayList<ItemStack> center;
+	private ArrayList<ItemStack> spawn = new ArrayList<ItemStack>();
+	private ArrayList<ItemStack> outer = new ArrayList<ItemStack>();
+	private ArrayList<ItemStack> inner = new ArrayList<ItemStack>();
+	private ArrayList<ItemStack> center = new ArrayList<ItemStack>();
 	private final int NUMITEMS = 5;
 	public static Optional<LootPool> obtain() {
 		if(!exists) {
@@ -123,33 +124,31 @@ public class LootPool {
 	public void generateLoot(Chest chest, Level l) {
 		Inventory inv = chest.getBlockInventory();
 		inv.clear();
+		ArrayList<Integer> slots = Skywars.generateRandomOrder(NUMITEMS, 0, inv.getSize());
+		
 		switch(l) {
 		case SPAWN:
-			for (int item : Skywars.generateRandomOrder(NUMITEMS, 0, spawn.size())) {
-				for (int slot : Skywars.generateRandomOrder(NUMITEMS, 0, inv.getSize())) {
-					inv.setItem(slot, spawn.get(item));
-				}
+			ArrayList<Integer> sitems = Skywars.generateRandomOrder(NUMITEMS, 0, spawn.size());
+			for(int i = 0; i != NUMITEMS; i++) {
+				inv.setItem(slots.get(i), spawn.get(sitems.get(i)));
 			}
 			break;
 		case OUTER_RING:
-			for (int item : Skywars.generateRandomOrder(NUMITEMS, 0, outer.size())) {
-				for (int slot : Skywars.generateRandomOrder(NUMITEMS, 0, inv.getSize())) {
-					inv.setItem(slot, outer.get(item));
-				}
+			ArrayList<Integer> oitems = Skywars.generateRandomOrder(NUMITEMS, 0, outer.size());
+			for(int i = 0; i != NUMITEMS; i++) {
+				inv.setItem(slots.get(i), outer.get(oitems.get(i)));
 			}
 			break;
 		case INNER_RING:
-			for (int item : Skywars.generateRandomOrder(NUMITEMS, 0, inner.size())) {
-				for (int slot : Skywars.generateRandomOrder(NUMITEMS, 0, inv.getSize())) {
-					inv.setItem(slot, inner.get(item));
-				}
+			ArrayList<Integer> iitems = Skywars.generateRandomOrder(NUMITEMS, 0, inner.size());
+			for(int i = 0; i != NUMITEMS; i++) {
+				inv.setItem(slots.get(i), inner.get(iitems.get(i)));
 			}
 			break;
 		case CENTER:
-			for (int item : Skywars.generateRandomOrder(NUMITEMS, 0, center.size())) {
-				for (int slot : Skywars.generateRandomOrder(NUMITEMS, 0, inv.getSize())) {
-					inv.setItem(slot, center.get(item));
-				}
+			ArrayList<Integer> citems = Skywars.generateRandomOrder(NUMITEMS, 0, center.size());
+			for(int i = 0; i != NUMITEMS; i++) {
+				inv.setItem(slots.get(i), center.get(citems.get(i)));
 			}
 			break;
 		}
