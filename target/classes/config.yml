@@ -1,9 +1,15 @@
 spawns: 12
+radius: 120
 lobby:
     world: "world"
     x: -304.5
     y: 83
     z: -896.5
+center:
+    world: "world"
+    x: -416
+    y: 94
+    z: -899
 map:
     spawn:
         world: "world"

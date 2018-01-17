@@ -19,17 +19,23 @@ import net.arcanemc.corev2.database.ConnectionManager;
 import net.arcanemc.corev2.database.ConnectionManager.RDBMS;
 import net.arcanemc.corev2.game.Game;
 import net.arcanemc.corev2.user.UserRetreiver;
+import net.arcanemc.skywars2.kit.Kit;
 import net.arcanemc.skywars2.kit.KitManager;
+import net.arcanemc.skywars2.kit.PoisonKitExecutor;
+import net.arcanemc.skywars2.kit.RecallKitExecutor;
+import net.arcanemc.skywars2.kit.RecallListener;
 
 public class Skywars extends JavaPlugin {
 	private ConnectionManager connManager = new ConnectionManager();
 	private UserRetreiver uRet;
 	private Connection conn;
 	private Commands commands = new Commands();
+	private MapDestructor destroy;
 	
+	private RecallListener kitlistener = new RecallListener(this);
 	private Game game;
 	private LootPool lootpool;
-	private KitManager kitmanager;
+	private KitManager kitmanager = new KitManager();
 	
 	private int NUM_SPAWNS = this.getConfig().getInt("spawns");
 	public static Random rand = new Random();
@@ -60,6 +66,10 @@ public class Skywars extends JavaPlugin {
 		return this.lootpool;
 	}
 	
+	public MapDestructor getMapD() {
+		return this.destroy;
+	}
+	
 	public int getNumSpawns() {
 		return this.NUM_SPAWNS;
 	}
@@ -67,13 +77,19 @@ public class Skywars extends JavaPlugin {
 	public void onEnable() {
 		//load and register maps from the config
 		
+		destroy = new MapDestructor(deserializeLocation("center"), getConfig().getInt("radius"));
+		
 		Bukkit.getServer().getPluginManager().registerEvents(new GameListener(this), this);
-		Bukkit.getServer().getPluginManager().registerEvents(new KitManager(), this);
+		Bukkit.getServer().getPluginManager().registerEvents(kitmanager, this);
+		Bukkit.getServer().getPluginManager().registerEvents(kitlistener, this);
+		
+		kitmanager.registerKit(new Kit("Poison", "Poison nearby players.", "poison", Material.GHAST_TEAR, 5, new PoisonKitExecutor()));
+		kitmanager.registerKit(new Kit("Recall", "Recall to last solid block.", "recall", Material.EYE_OF_ENDER, 2, new RecallKitExecutor(kitlistener)));
 		
 		connManager.initializeDatabasePool("skywars_main", RDBMS.POSTGRESQL, "app", "?_9KpC4q7&#Y/Rwu", "127.0.0.1", 5432, "prod", 2);
 		conn = connManager.getPooledConnection("skywars_main");
 		uRet = new UserRetreiver(connManager, "skywars_main");
-		game = new Game(this, uRet, 2, NUM_SPAWNS, (u -> {
+		game = new Game(this, uRet, 1, NUM_SPAWNS, (u -> {
 			//the example says to save u here. Do I need to save it to my own container, or put it in the game somehow,
 			//or not do anything with it, or do something else completely?
 			return true;

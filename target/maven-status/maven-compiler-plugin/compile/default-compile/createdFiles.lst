@@ -1,5 +1,9 @@
 net\arcanemc\skywars2\LootPool.class
+net\arcanemc\skywars2\MapDestructor$Destructor.class
+net\arcanemc\skywars2\MapDestructor.class
 net\arcanemc\skywars2\GameListener$1.class
+net\arcanemc\skywars2\kit\RecallKitExecutor.class
+net\arcanemc\skywars2\kit\RecallListener.class
 net\arcanemc\skywars2\Commands.class
 net\arcanemc\skywars2\kit\PoisonKitExecutor.class
 net\arcanemc\skywars2\kit\KitManager.class

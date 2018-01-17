@@ -48,7 +48,7 @@ public class GameListener implements Listener{
 		case JOIN_WAIT:
 			//actual players
 			e.getPlayer().teleport(plugin.deserializeLocation("lobby"));
-			e.getPlayer().getInventory().setItem(4, Kit.generateItem("Kit Selector", "", Material.SLIME_BALL, "selectkit"));
+			e.getPlayer().getInventory().setItem(4, Kit.generateItem("Kit Selector", "", 1, Material.SLIME_BALL, "selectkit"));
 			break;
 		case JOIN_CLOSED:
 		case START_WAIT:
@@ -190,6 +190,11 @@ public class GameListener implements Listener{
 				player.teleport(plugin.deserializeLocation("lobby"));
 			}
 		}
+	}
+	
+	@EventHandler
+	public void onStart(GameStartEvent e) {
+		plugin.getMapD().start(plugin);
 	}
 	
 	@EventHandler

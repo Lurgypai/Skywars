@@ -48,6 +48,9 @@ public class LootPool {
 		spawn.add(makeItem(Material.ARROW, 4));
 		spawn.add(makeItem(Material.ARROW, 4));
 		spawn.add(makeItem(Material.ARROW, 4));
+		spawn.add(makeItem(Material.APPLE, 4));
+		spawn.add(makeItem(Material.APPLE, 4));
+		spawn.add(makeItem(Material.APPLE, 3));
 		//outer
 		outer.add(makeItem(Material.STONE_AXE));
 		outer.add(makeItem(Material.STONE_SWORD));
@@ -71,6 +74,9 @@ public class LootPool {
 		outer.add(makeItem(Material.DIAMOND, 7));
 		outer.add(makeItem(Material.FLINT_AND_STEEL));
 		outer.add(makeItem(Material.WATER_BUCKET));
+		outer.add(makeItem(Material.GOLDEN_CARROT, 4));
+		outer.add(makeItem(Material.GOLDEN_CARROT, 3));
+		outer.add(makeItem(Material.GOLDEN_CARROT, 3));
 		//inner
 		inner.add(makeItem(Material.IRON_SWORD));
 		inner.add(makeItem(Material.IRON_AXE));
@@ -101,6 +107,10 @@ public class LootPool {
 		inner.add(makeItem(Material.FLINT_AND_STEEL));
 		inner.add(makeItem(Material.WATER_BUCKET));
 		inner.add(makeItem(Material.LAVA_BUCKET));
+		inner.add(makeItem(Material.COOKED_BEEF, 2));
+		inner.add(makeItem(Material.COOKED_BEEF, 2));
+		inner.add(makeItem(Material.COOKED_BEEF, 2));
+		inner.add(makeItem(Material.COOKED_BEEF, 2));
 		//center
 		center.add(makeItem(Material.DIAMOND_AXE));
 		center.add(makeItem(Material.DIAMOND_PICKAXE));
@@ -112,6 +122,8 @@ public class LootPool {
 		center.add(makeItem(Material.OBSIDIAN, 10));
 		center.add(makeItem(Material.TNT, 16));
 		center.add(makeItem(Material.LAVA_BUCKET));
+		center.add(makeItem(Material.COOKED_BEEF, 5));
+		center.add(makeItem(Material.COOKED_BEEF, 5));
 	}
 	
 	public static enum Level{

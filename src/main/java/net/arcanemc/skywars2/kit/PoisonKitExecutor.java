@@ -10,7 +10,9 @@ public class PoisonKitExecutor implements KitExecutor {
 	public void execute(Player user) {
 		for(Player player : user.getWorld().getPlayers()) {
 			if(user.getLocation().distance(player.getLocation()) < 5) {
-				player.addPotionEffect(new PotionEffect(PotionEffectType.POISON, 15, 2));
+				if(user.getUniqueId() != player.getUniqueId()) {
+					player.addPotionEffect(new PotionEffect(PotionEffectType.POISON, 100, 1));
+				}
 			}
 		}
 	}

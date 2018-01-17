@@ -20,11 +20,11 @@ public class Kit {
 	private String tag;
 	private KitExecutor execute;
 	
-	Kit(String name_, String desc_, String tag_, Material mat_, KitExecutor execute_) {
+	public Kit(String name_, String desc_, String tag_, Material mat_, int num, KitExecutor execute_) {
 		this.name = name_;
 		this.desc = desc_;
 		this.tag = tag_;
-		this.item = Kit.generateItem(name, desc, mat_, tag);
+		this.item = Kit.generateItem(name, desc, num, mat_, tag);
 		this.execute = execute_;
 	}
 	
@@ -40,8 +40,8 @@ public class Kit {
 		return this.item;
 	}
 	
-	public static ItemStack generateItem(String name, String desc, Material mat, String tag) {
-		ItemStack item =  new ItemStack(mat, 1, (byte)0);
+	public static ItemStack generateItem(String name, String desc, int num, Material mat, String tag) {
+		ItemStack item =  new ItemStack(mat, num, (byte)0);
 		
 		net.minecraft.server.v1_8_R3.ItemStack nmsItem = CraftItemStack.asNMSCopy(item);
 		NBTTagCompound nbttc = new NBTTagCompound();
