@@ -8,17 +8,21 @@ import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.craftbukkit.v1_8_R3.inventory.CraftItemStack;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.inventory.ItemStack;
 
 import net.arcanemc.corev2.game.GameChatFormat;
 import net.arcanemc.corev2.game.GameUser;
@@ -60,25 +64,6 @@ public class GameListener implements Listener{
 	}
 	
 	@EventHandler
-	public void onDeath(PlayerDeathEvent e) {
-		//set as spectator
-		plugin.getGame().getGpAdmin().getGameUserByUUID(e.getEntity().getUniqueId()).get().setMode(Mode.SPECTATOR);
-        User.resetState(e.getEntity());
-		e.getEntity().setGameMode(GameMode.ADVENTURE);
-		e.getEntity().setAllowFlight(true);
-        Bukkit.getOnlinePlayers().forEach(pl -> pl.hidePlayer(e.getEntity()));
-        //teleport
-        e.getEntity().teleport(plugin.deserializeLocation("map.spawn"));
-        Bukkit.broadcastMessage(GameChatFormat.ANNOUNCEMENT.getFormat() + "Player " + e.getEntity().getDisplayName() + " has died.");
-        //check if we have a winner
-        if(plugin.getGame().getGpAdmin().getPlayers().stream().filter(u -> u.getMode() == Mode.PLAYER).toArray().length == 1) {
-	    	Bukkit.broadcastMessage(GameChatFormat.ANNOUNCEMENT.getFormat() +
-	    			Bukkit.getPlayer(plugin.getGame().getGpAdmin().getPlayers().get(0).getId()).getDisplayName() + " has WON!");
-        	plugin.getGame().setState(State.END_WAIT);
-        }
-	}
-	
-	@EventHandler
 	public void onQuit(PlayerQuitEvent e) {
 		if(plugin.getGame().getGpAdmin().getPlayers().stream().filter(u -> u.getMode() == Mode.PLAYER).toArray().length == 1) {
 	    	Bukkit.broadcastMessage(GameChatFormat.ANNOUNCEMENT.getFormat() +
@@ -116,6 +101,51 @@ public class GameListener implements Listener{
 						}
 					Bukkit.getLogger().info("[Skywars] Saved chest location.");
 					}).start();
+			}
+		}
+	}
+	
+	@EventHandler
+	public void damager(EntityDamageByEntityEvent e) {
+		switch(plugin.getGame().getState()) {
+		case JOIN_WAIT:
+		case JOIN_CLOSED:
+			e.setCancelled(true);
+			break;
+		}
+	}
+	
+	@EventHandler
+	public void damage(EntityDamageEvent e) {
+		if(plugin.getGame().getState() == State.START) {
+			if(e.getEntity() instanceof Player) {
+				Player player = (Player)e.getEntity();
+				if(e.getDamage() > player.getHealth()) {
+					//set spectator
+					for(ItemStack item : player.getInventory()) {
+						player.getWorld().dropItem(player.getLocation(), item);
+					}
+					player.getInventory().clear();
+					player.setHealth(20);
+					plugin.getGame().getGpAdmin().getGameUserByUUID(e.getEntity().getUniqueId()).get().setMode(Mode.SPECTATOR);
+			        User.resetState(player);
+					player.setGameMode(GameMode.ADVENTURE);
+					player.setAllowFlight(true);
+			        Bukkit.getOnlinePlayers().forEach(pl -> pl.hidePlayer(player));
+			        //teleport
+			        e.getEntity().teleport(plugin.deserializeLocation("map.spawn"));
+			        Bukkit.broadcastMessage(GameChatFormat.ANNOUNCEMENT.getFormat() + "Player " + player.getDisplayName() + " has died.");
+			        //check if we have a winner
+			        if(plugin.getGame().getGpAdmin().getPlayers().stream().filter(u -> u.getMode() == Mode.PLAYER).toArray().length == 1) {
+			        	for(GameUser user : plugin.getGame().getGpAdmin().getPlayers()) {
+			        		if(user.getMode() == Mode.PLAYER) {
+			        			Bukkit.broadcastMessage(GameChatFormat.ANNOUNCEMENT.getFormat() + Bukkit.getPlayer(user.getId()).getName() + "  has won!");
+			        		}
+			        	}
+			        	plugin.getGame().setState(State.END_WAIT);
+			        }
+			        e.setCancelled(true);
+				}
 			}
 		}
 	}
